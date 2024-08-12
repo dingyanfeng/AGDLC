@@ -13,7 +13,6 @@ import arithmeticcoding_fast
 import struct
 import shutil
 import time
-import math
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -55,7 +54,7 @@ def compress(model, X_dict, Y, seq_1, bs, vocab_dict, timesteps, device, optimiz
         train_loss = 0
         start_time = time.time()
         for j in (range(num_iters - idx)):
-            bx = {num: Variable(torch.from_numpy(X_dict[num][ind, :])).to(device) for num, _ in X_dict.items()}
+            bx = {num: Variable(torch.from_numpy(X_dict[num][ind, :])).to(device) for num, _ in vocab_dict.items()}
             by = Variable(torch.from_numpy(Y[ind])).to(device)
 
             with torch.no_grad():
@@ -83,7 +82,7 @@ def compress(model, X_dict, Y, seq_1, bs, vocab_dict, timesteps, device, optimiz
             if (j + 1) % block_len == 0:
                 indices = np.concatenate([ind - p for p in range(block_len)], axis=0)
 
-                bx = {num: Variable(torch.from_numpy(X_dict[num][indices, :])).to(device) for num, _ in X_dict.items()}
+                bx = {num: Variable(torch.from_numpy(X_dict[num][indices, :])).to(device) for num, _ in vocab_dict.items()}
                 by = Variable(torch.from_numpy(Y[indices])).to(device)
                 model.train()
                 optimizer.zero_grad()
@@ -114,7 +113,7 @@ def compress(model, X_dict, Y, seq_1, bs, vocab_dict, timesteps, device, optimiz
             enc.write(cumul, seq_1[l+j])
         for i in (range(len(Y))):
             # bx = Variable(torch.from_numpy(X[i:i + 1, :])).to(device)
-            bx = {num: Variable(torch.from_numpy(X_dict[num][i:i + 1, :])).to(device) for num, _ in X_dict.items()}
+            bx = {num: Variable(torch.from_numpy(X_dict[num][i:i + 1, :])).to(device) for num, _ in vocab_dict.items()}
             with torch.no_grad():
                 model.eval()
                 pred = model(bx)
@@ -158,6 +157,21 @@ def var_int_encode(byte_str_len, f):
         byte_str_len -= 1
 
 
+def get_elements(arr, idx_range, k, step, timesteps):
+    result = np.empty((len(idx_range), timesteps), dtype=arr.dtype)
+    for idx, i in enumerate(idx_range):
+        end_index = max(0, k + i - 1 - ((timesteps - 1) * step))  # 计算起始索引
+        start_index = k + i  # 结束索引为第i个元素的下一个索引
+        series_data = arr[start_index:end_index:-step]
+        
+        if k + i - ((timesteps - 1) * step) == 0:
+            series_data = np.append(series_data, arr[0])
+        if len(series_data) != timesteps:
+            raise ValueError("Length of get_elements result is not timesteps.")
+        result[idx] = series_data[::-1]  # 使用切片操作获取元素
+    return result
+
+
 def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
     batch_size = FLAGS.bs
@@ -178,22 +192,12 @@ def main():
     vocab_dict = {}
     emb_dict = {}
     hidden_dict = {}
-    series_dict = {}
     # ————————
     for number in skmer_list:
         _, k = str(number).split('.')
-
-        sequence = np.load("Params-Seq/" + FLAGS.file_name + "_" + k + ".npy")
         vocab_dict[number] = pow(4, int(k))
         emb_dict[number] = 16
         hidden_dict[number] = 128
-        sequence = sequence
-
-        sequence = sequence.reshape(-1)
-        series = sequence.copy()
-        series_dict[number] = series
-
-    
 
     FLAGS.param = "Params-Seq/params_" + os.path.splitext(FLAGS.file_name)[0] + "_" + str(1)
     with open(FLAGS.param, 'r') as f:
@@ -203,29 +207,19 @@ def main():
     with open(FLAGS.output + '.params', 'w') as f:
         json.dump(params, f, indent=4)
 
-    X_dict = {num: [] for num, _ in series_dict.items()}
-    Y = []
     # idx = n * s + k - 1   (n=0,1,2...; idx是从0开始得到的结果)
     pred_sequence = np.load("Params-Seq/" + FLAGS.file_name + "_" + str(1) + ".npy")
     FLAGS.data_len = len(pred_sequence)
-    idx = max([(timesteps - 1) * int(str(num).split('.')[0]) + int(str(num).split('.')[1]) for num, _ in series_dict.items()])
-    for num, _ in series_dict.items():
+    idx = max([(timesteps - 1) * int(str(num).split('.')[0]) + int(str(num).split('.')[1]) for num in skmer_list])
+    X_dict = {}
+    Y = pred_sequence[idx:idx+FLAGS.data_len].copy()
+    for num in skmer_list:
         s, k = str(num).split('.')
-        def get_elements(arr, k, step, timesteps):
-            end_index = max(0, k-1 - ((timesteps-1) * step))  # 计算起始索引
-            start_index = k  # 结束索引为第k个元素的下一个索引
-            series_data = arr[start_index:end_index:-step]
-            
-            if k - ((timesteps-1) * step) == 0:
-                series_data = np.append(series_data, arr[0])
-            if len(series_data) != timesteps:
-                raise ValueError(f"Length of get_elements-result is not timesteps.")
-            return series_data[::-1]  # 使用切片操作获取元素
-        for i in range(0, FLAGS.data_len-idx):
-            X_dict[num].append(get_elements(series_dict[num], idx+i-int(k), int(s), timesteps))
-            
-    for i in range(0, FLAGS.data_len-idx):
-        Y.append(pred_sequence[idx+i])
+        sequence = np.load("Params-Seq/" + FLAGS.file_name + "_" + k + ".npy")
+        sequence = sequence
+        sequence = sequence.reshape(-1)
+        series = sequence.copy()
+        X_dict[num] = get_elements(series, range(0, FLAGS.data_len - idx), idx-int(k), int(s), timesteps)
 
     cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_dict,
                  'hidden_sizes': hidden_dict, 'seq_length': timesteps}
@@ -238,14 +232,10 @@ def main():
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, threshold=1e-2, patience=1000,
                                                      cooldown=10000, min_lr=1e-4)
 
-    X_dict = {num: np.array(value) for num, value in X_dict.items()}
-    Y = np.array(Y)
-
     l = int(len(pred_sequence) / batch_size) * batch_size
 
     compress(cskmerm, X_dict, Y, pred_sequence, batch_size, vocab_dict, timesteps, device, optimizer, scheduler)
     if l < len(pred_sequence) - idx:
-        # {num: Variable(torch.from_numpy(X_dict[num][i:i + 1, :])).to(device) for num, _ in X_dict.items()}
         compress(cskmerm, {num: X_dict[num][l:] for num,_ in X_dict.items()}, Y[l:], pred_sequence, 1, vocab_dict, timesteps, device, optimizer, scheduler, final_step=True)
     else:
         f = open(FLAGS.temp_file_prefix + '.last', 'wb')

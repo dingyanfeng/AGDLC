@@ -69,29 +69,26 @@ data = re.sub(r'[^ACGT]', '', data)
 print("Seq Length {}".format(len(data)))
 print(k_list)
 
-base_id = 0
+def encode_sequence(data, char2id_dict, k, w):
+    res = []
+    i = 0
+    while i < len(data) - k + w:
+        sub_ = str(data[i:i + k])
+        if len(sub_) == k :
+            res.append(char2id_dict[sub_])
+        else:
+            params['Write-Chars'] = sub_[k-w:]
+        i = i + w
+    return res
 for k in k_list:
-    # s, k = str(number).split('.')
     char2id_dict, id2char_dict = get_dict(['A','C','G','T'], k)
-    char2id_dict = {key: value + base_id for key, value in char2id_dict.items()}
-    id2char_dict = {key + base_id: value for key, value in id2char_dict.items()}
-    params = {'char2id_dict':char2id_dict, 'id2char_dict':id2char_dict, 'Write-Chars':""}
-    def encode_sequence(data, char2id_dict, k, w):
-        res = []
-        i = 0
-        while i < len(data) - k + w:
-            sub_ = str(data[i:i + k])
-            if len(sub_) == k :
-                res.append(char2id_dict[sub_])
-            else:
-                params['Write-Chars'] = sub_[k-w:]
-            i = i + w
-        return res
+    char2id_dict = {key: value for key, value in char2id_dict.items()}
+    id2char_dict = {key: value for key, value in id2char_dict.items()}
+    params = {'char2id_dict':char2id_dict, 'id2char_dict':id2char_dict}
+    
     temp_data = encode_sequence(data, char2id_dict, k, 1)
     params['Length-Data'] = len(data)
     with open(param_dict[int(k)], 'w') as f:
         json.dump(params, f, indent=4)
     integer_encoded = np.array(temp_data)
-    # print(integer_encoded)
     np.save(output_dict[int(k)], integer_encoded)
-    # base_id += len(char2id_dict)
