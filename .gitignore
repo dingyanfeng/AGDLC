@@ -5,5 +5,5 @@
 /Params-Seq
 /temp
 /__pycache__
-/output.log
+/*.log
 /test.py
