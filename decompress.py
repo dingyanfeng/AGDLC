@@ -255,7 +255,7 @@ def main():
     shutil.rmtree('temp')
     print("Done")
 
-    print('Peak GPU memory usage:{} KBs'.format(torch.cuda.max_memory_allocated()//1024))
+    print('Peak GPU memory usage: {} KBs'.format(torch.cuda.max_memory_allocated()//1024))
 
 
 if __name__ == "__main__":
