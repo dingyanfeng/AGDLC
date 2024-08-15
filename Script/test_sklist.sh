@@ -5,7 +5,7 @@ echo ${data}
 base_name=$(basename ${data})
 base_name_without_extension=$(echo "$base_name" | cut -d. -f1)
 # 创建保存结果的目录
-data_path=/home/dyf/Dynamic-skmer/Result_ns/sklist/${base_name_without_extension}
+data_path=/home/dyf/Dynamic-skmer/Result-ns/sklist/${base_name_without_extension}
 if [ ! -d "${data_path}" ]; then
   mkdir -p "${data_path}"
   echo "Created directory: ${data_path}"
@@ -114,6 +114,10 @@ function DSKmer() {
 for (( i = 1; i <= 4; i++ )); do
     echo "DSKmer ${i}.${i} LSTM"
     DSKmer ${i}.${i} LSTM
+done
+for (( i = 1; i <= 4; i++ )); do
+    echo "DSKmer ${i}.${i} biLSTM"
+    DSKmer ${i}.${i} biLSTM
 done
 cat ${sum_result}
 exit 0
