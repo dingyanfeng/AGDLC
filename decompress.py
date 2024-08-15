@@ -146,6 +146,8 @@ def get_argument_parser():
                         help='GPU to use')
     parser.add_argument('--output', type=str, default='Test',
                         help='Name of the output file')
+    parser.add_argument('--module_type', type=str, default='LSTM',
+                        help='Module Type')
     return parser
 
 
@@ -212,8 +214,9 @@ def main():
         emb_dict[number] = 16
         hidden_dict[number] = 128
 
+    module_type = FLAGS.module_type
     cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_dict,
-                 'hidden_sizes': hidden_dict, 'seq_length': timesteps}
+                 'hidden_sizes': hidden_dict, 'seq_length': timesteps, 'module_type':module_type}
     cskmerm = MultiLSTMModel(**cskmerdic).to(device)
 
     optimizer = optim.Adam(cskmerm.parameters(), lr=5e-4, betas=(0.0, 0.999))

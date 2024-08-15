@@ -137,8 +137,8 @@ def get_argument_parser():
                         help='GPU to use')
     parser.add_argument('--output', type=str, default='Output/Test',
                         help='Name of the output file')
-    # parser.add_argument('--model_weights_path', type=str, default='file_bstrap',
-    #                     help='Path to model parameters')
+    parser.add_argument('--module_type', type=str, default='LSTM',
+                        help='module type')
     parser.add_argument('--timesteps', type=int, default='16',
                         help='Number of timesteps')
     parser.add_argument('--bs', type=int, default='320',
@@ -221,8 +221,9 @@ def main():
         series = sequence.copy()
         X_dict[num] = get_elements(series, range(0, FLAGS.data_len - idx), idx-int(k), int(s), timesteps)
 
+    module_type = FLAGS.module_type
     cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_dict,
-                 'hidden_sizes': hidden_dict, 'seq_length': timesteps}
+                 'hidden_sizes': hidden_dict, 'seq_length': timesteps, 'module_type':module_type}
     # print(cskmerdic)
     # Define Model
     cskmerm = MultiLSTMModel(**cskmerdic).to(device)
