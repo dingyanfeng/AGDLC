@@ -158,19 +158,10 @@ def var_int_encode(byte_str_len, f):
 
 
 def get_elements(arr, idx_range, k, step, timesteps):
-    result = np.empty((len(idx_range), timesteps), dtype=arr.dtype)
-    for idx, i in enumerate(idx_range):
-        end_index = max(0, k + i - 1 - ((timesteps - 1) * step))  # 计算起始索引
-        start_index = k + i  # 结束索引为第i个元素的下一个索引
-        series_data = arr[start_index:end_index:-step]
-        
-        if k + i - ((timesteps - 1) * step) == 0:
-            series_data = np.append(series_data, arr[0])
-        if len(series_data) != timesteps:
-            raise ValueError("Length of get_elements result is not timesteps.")
-        result[idx] = series_data[::-1]  # 使用切片操作获取元素
-    return result
-
+    return np.lib.stride_tricks.as_strided(arr[k-(timesteps-1)*step:], 
+                                           shape=(idx_range, (timesteps-1)*step+1), 
+                                           strides=(arr.strides[0], arr.strides[0]))
+    
 
 def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS.gpu
@@ -213,13 +204,15 @@ def main():
     idx = max([(timesteps - 1) * int(str(num).split('.')[0]) + int(str(num).split('.')[1]) for num in skmer_list])
     X_dict = {}
     Y = pred_sequence[idx:idx+FLAGS.data_len].copy()
+    series_dict = {}
     for num in skmer_list:
         s, k = str(num).split('.')
         sequence = np.load("Params-Seq/" + FLAGS.file_name + "_" + k + ".npy")
         sequence = sequence
         sequence = sequence.reshape(-1)
         series = sequence.copy()
-        X_dict[num] = get_elements(series, range(0, FLAGS.data_len - idx), idx-int(k), int(s), timesteps)
+        series_dict[num] = series
+        X_dict[num] = get_elements(series_dict[num], FLAGS.data_len - idx, idx-int(k), int(s), timesteps)[:,::int(s)]
 
     module_type = FLAGS.module_type
     cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_dict,
