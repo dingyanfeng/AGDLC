@@ -92,7 +92,7 @@ function DSKmer() {
   echo "Throughtput : ${TRP} KB/S"
   echo "6 Output file into ${sum_result}..."
   # "ALG, DS(B), CS(B), CR(bits/base), CT(S), DT(S), CPM(KB), DPM(KB)"
-  echo "${T_SKLIST}_${T_MODULE}, ${SourceFileSize}, ${CompressedFileSize}, ${CompressionRatio}, $(timer_reans $CompressionTime), ${CompressionMemory}, $(timer_reans $DeCompressionTime), ${DeCompressionMemory} ${GPUMem} ${TRP}" >>${sum_result}
+  echo "${T_SKLIST}_${T_MODULE}, ${SourceFileSize}, ${CompressedFileSize}, ${CompressionRatio}, $(timer_reans $CompressionTime), ${CompressionMemory}, $(timer_reans $DeCompressionTime), ${DeCompressionMemory}, ${GPUMem}, ${TRP}" >>${sum_result}
   echo "7 Check the integrity of the decompressed file..."
   python /home/dyf/Dynamic-skmer/Script/tool.py cmp /home/dyf/Dynamic-skmer/DecompRes/${base_name_without_extension} ${data}
   if [ $? -ne 0 ]; then
@@ -112,12 +112,102 @@ function DSKmer() {
 # DSKmer ${data} ${SKLIST} ${MODULE_TYPE}
 # echo "************************************************"
 for (( i = 1; i <= 4; i++ )); do
-    echo "DSKmer ${i}.${i} LSTM"
-    DSKmer ${i}.${i} LSTM
+  for (( j = i; j <= 4; j++ )); do
+    echo "DSKmer ${i}.${j} LSTM"
+    DSKmer ${i}.${j} LSTM
+  done
 done
 for (( i = 1; i <= 4; i++ )); do
-    echo "DSKmer ${i}.${i} biLSTM"
-    DSKmer ${i}.${i} biLSTM
+  for (( j = i; j <= 4; j++ )); do
+    echo "DSKmer ${i}.${j} biLSTM"
+    DSKmer ${i}.${j} biLSTM
+  done
 done
+for (( i = 1; i <= 4; i++ )); do
+  for (( j = i; j <= 4; j++ )); do
+    echo "DSKmer ${i}.${j} xLSTM"
+    DSKmer ${i}.${j} xLSTM
+  done
+done
+echo "DSKmer 1.1+1.2 LSTM"
+DSKmer 1.1+1.2 LSTM
+
+echo "DSKmer 1.2+2.2 LSTM"
+DSKmer 1.2+2.2 LSTM
+
+echo "DSKmer 2.2+2.3 LSTM"
+DSKmer 2.2+2.3 LSTM
+
+echo "DSKmer 1.3+2.3 LSTM"
+DSKmer 1.3+2.3 LSTM
+
+echo "DSKmer 2.3+3.3 LSTM"
+DSKmer 2.3+3.3 LSTM
+
+echo "DSKmer 3.3+3.4 LSTM"
+DSKmer 3.3+3.4 LSTM
+
+echo "DSKmer 1.4+2.4 LSTM"
+DSKmer 1.4+2.4 LSTM
+
+echo "DSKmer 2.4+3.4 LSTM"
+DSKmer 2.4+3.4 LSTM
+
+echo "DSKmer 3.4+4.4 LSTM"
+DSKmer 3.4+4.4 LSTM
+
+echo "DSKmer 1.1+1.2 biLSTM"
+DSKmer 1.1+1.2 biLSTM
+
+echo "DSKmer 1.2+2.2 biLSTM"
+DSKmer 1.2+2.2 biLSTM
+
+echo "DSKmer 2.2+2.3 biLSTM"
+DSKmer 2.2+2.3 biLSTM
+
+echo "DSKmer 1.3+2.3 biLSTM"
+DSKmer 1.3+2.3 biLSTM
+
+echo "DSKmer 2.3+3.3 biLSTM"
+DSKmer 2.3+3.3 biLSTM
+
+echo "DSKmer 3.3+3.4 biLSTM"
+DSKmer 3.3+3.4 biLSTM
+
+echo "DSKmer 1.4+2.4 biLSTM"
+DSKmer 1.4+2.4 biLSTM
+
+echo "DSKmer 2.4+3.4 biLSTM"
+DSKmer 2.4+3.4 biLSTM
+
+echo "DSKmer 3.4+4.4 biLSTM"
+DSKmer 3.4+4.4 biLSTM
+
+echo "DSKmer 1.1+1.2 xLSTM"
+DSKmer 1.1+1.2 xLSTM
+
+echo "DSKmer 1.2+2.2 xLSTM"
+DSKmer 1.2+2.2 xLSTM
+
+echo "DSKmer 2.2+2.3 xLSTM"
+DSKmer 2.2+2.3 xLSTM
+
+echo "DSKmer 1.3+2.3 xLSTM"
+DSKmer 1.3+2.3 xLSTM
+
+echo "DSKmer 2.3+3.3 xLSTM"
+DSKmer 2.3+3.3 xLSTM
+
+echo "DSKmer 3.3+3.4 xLSTM"
+DSKmer 3.3+3.4 xLSTM
+
+echo "DSKmer 1.4+2.4 xLSTM"
+DSKmer 1.4+2.4 xLSTM
+
+echo "DSKmer 2.4+3.4 xLSTM"
+DSKmer 2.4+3.4 xLSTM
+
+echo "DSKmer 3.4+4.4 xLSTM"
+DSKmer 3.4+4.4 xLSTM
 cat ${sum_result}
 exit 0
