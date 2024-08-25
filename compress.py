@@ -169,7 +169,7 @@ def main():
     timesteps = FLAGS.timesteps
     use_cuda = True
     use_cuda = use_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
+    device = torch.device(f"cuda:{FLAGS.gpu}" if use_cuda else "cpu")
 
     skmer_list= [float(num) for num in FLAGS.skmer_list.split('+')]
     FLAGS.temp_dir = 'temp'
@@ -181,14 +181,12 @@ def main():
 
     # 准备参数
     vocab_dict = {}
-    emb_dict = {}
-    hidden_dict = {}
+    emb_size = 16
+    hidden_size = 128
     # ————————
     for number in skmer_list:
         _, k = str(number).split('.')
         vocab_dict[number] = pow(4, int(k))
-        emb_dict[number] = 16
-        hidden_dict[number] = 128
 
     FLAGS.param = "Params-Seq/params_" + os.path.splitext(FLAGS.file_name)[0] + "_" + str(1)
     with open(FLAGS.param, 'r') as f:
@@ -215,8 +213,8 @@ def main():
         X_dict[num] = get_elements(series_dict[num], FLAGS.data_len - idx, idx-int(k), int(s), timesteps)[:,::int(s)]
 
     module_type = FLAGS.module_type
-    cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_dict,
-                 'hidden_sizes': hidden_dict, 'seq_length': timesteps, 'module_type':module_type}
+    cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_size,
+                 'hidden_sizes': hidden_size, 'seq_length': timesteps, 'module_type':module_type}
     # print(cskmerdic)
     # Define Model
     cskmerm = MultiLSTMModel(**cskmerdic).to(device)

@@ -5,7 +5,7 @@ echo ${data}
 base_name=$(basename ${data})
 base_name_without_extension=$(echo "$base_name" | cut -d. -f1)
 # 创建保存结果的目录
-data_path=/home/dyf/Dynamic-skmer/Result-ns/sklist/${base_name_without_extension}
+data_path=/home/dyf/Dynamic-skmer/Result-om/sklist/${base_name_without_extension}
 if [ ! -d "${data_path}" ]; then
   mkdir -p "${data_path}"
   echo "Created directory: ${data_path}"

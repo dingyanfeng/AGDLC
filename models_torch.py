@@ -64,16 +64,11 @@ class MultiLSTMModel(nn.Module):
     def __init__(self, skmer_list, vocab_sizes, emb_sizes, hidden_sizes, seq_length, module_type):
         super(MultiLSTMModel, self).__init__()
         self.skmer_list = skmer_list
-        self.total_vocab = sum(vocab_sizes.values())
-        self.lstm_models = nn.ModuleList([SingleLSTMModel(vocab_size=vocab_sizes[i], seq_length=seq_length, emb_size=emb_sizes[i], hidden_size=hidden_sizes[i], module_type=module_type) for i in skmer_list])
-        self.weights = nn.Parameter(torch.ones(len(skmer_list)) / torch.tensor(skmer_list, dtype=torch.float32), requires_grad=True)
+        max_vocab = max(vocab_sizes.values())
+        self.lstm_models = SingleLSTMModel(vocab_size=max_vocab, seq_length=len(skmer_list)*seq_length, emb_size=emb_sizes, hidden_size=hidden_sizes, module_type=module_type)
 
     def forward(self, inputs):
-        lstm_outputs = {}
-        for index, i in enumerate(self.skmer_list):
-            lstm_out = self.lstm_models[index](inputs[i])
-            lstm_outputs[i]=lstm_out
-        # logits_mix = sum(lstm_outputs.values()) / len(lstm_outputs)
-        normalized_weights = nn.functional.softmax(self.weights, dim=0)
-        logits_mix = sum(normalized_weights[i] * value for i, value in enumerate(lstm_outputs.values()))
-        return logits_mix
+        value_list = [value for value in inputs.values()]
+        concatenated_data = torch.cat(value_list, dim=1)
+        logits = self.lstm_models(concatenated_data)
+        return logits

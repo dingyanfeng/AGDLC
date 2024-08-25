@@ -205,18 +205,16 @@ def main():
     series = np.zeros(len_series,dtype=np.uint8)
 
     vocab_dict = {}
-    emb_dict = {}
-    hidden_dict = {}
+    emb_size = 16
+    hidden_size = 128
     skmer_list= [float(num) for num in FLAGS.skmer_list.split('+')]
     for number in skmer_list:
         _, k = str(number).split('.')
         vocab_dict[number] = pow(4, int(k))
-        emb_dict[number] = 16
-        hidden_dict[number] = 128
 
     module_type = FLAGS.module_type
-    cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_dict,
-                 'hidden_sizes': hidden_dict, 'seq_length': timesteps, 'module_type':module_type}
+    cskmerdic = {'skmer_list': skmer_list, 'vocab_sizes': vocab_dict, 'emb_sizes': emb_size,
+                 'hidden_sizes': hidden_size, 'seq_length': timesteps, 'module_type':module_type}
     cskmerm = MultiLSTMModel(**cskmerdic).to(device)
 
     optimizer = optim.Adam(cskmerm.parameters(), lr=5e-4, betas=(0.0, 0.999))
