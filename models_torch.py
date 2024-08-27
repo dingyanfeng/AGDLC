@@ -37,7 +37,7 @@ class SingleLSTMModel(nn.Module):
                 proj_factor: 1.3
                 act_fn: gelu
             context_length: {seq_length}
-            num_blocks: 2
+            num_blocks: 5
             embedding_dim: {emb_size}
             slstm_at: [] #[1]
             """

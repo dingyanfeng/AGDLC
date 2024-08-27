@@ -101,11 +101,11 @@ function DSKmer() {
   #   #exit 1
   #   echo "${T_SKLIST}err! try again"  >>${sum_result}
   # fi
-  echo "8 Delete file..."
-  rm -rf CompRes/${base_name_without_extension}*
-  # rm -rf DecompRes/${base_name_without_extension}
-  rm -rf Params-Seq/${base_name_without_extension}*
-  rm -rf Params-Seq/params_${base_name_without_extension}*
+  # echo "8 Delete file..."
+  # rm -rf CompRes/${base_name_without_extension}*
+  # # rm -rf DecompRes/${base_name_without_extension}
+  # rm -rf Params-Seq/${base_name_without_extension}*
+  # rm -rf Params-Seq/params_${base_name_without_extension}*
 #   cd ${pwd_path}
 }
 
@@ -210,23 +210,23 @@ function DSKmer() {
 
 # echo "DSKmer 3.4+4.4 xLSTM"
 # DSKmer 3.4+4.4 xLSTM
+echo "DSKmer 1.1 xLSTM"
+DSKmer 1.1 xLSTM
 
-echo "DSKmer 1.3+1.4 xLSTM"
-DSKmer 1.3+1.4 xLSTM
+echo "DSKmer 1.2 xLSTM"
+DSKmer 1.2 xLSTM
 
-echo "DSKmer 1.2+1.3 xLSTM"
-DSKmer 1.2+1.3 xLSTM
+echo "DSKmer 2.2 xLSTM"
+DSKmer 2.2 xLSTM
+
+echo "DSKmer 2.3 xLSTM"
+DSKmer 2.3 xLSTM
 
 echo "DSKmer 1.1+1.2 xLSTM"
 DSKmer 1.1+1.2 xLSTM
 
-echo "DSKmer 2.3+2.4 xLSTM"
-DSKmer 2.3+2.4 xLSTM
-
 echo "DSKmer 2.2+2.3 xLSTM"
 DSKmer 2.2+2.3 xLSTM
 
-echo "DSKmer 3.3+3.4 xLSTM"
-DSKmer 3.3+3.4 xLSTM
 cat ${sum_result}
 exit 0
