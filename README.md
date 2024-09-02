@@ -17,13 +17,13 @@ AGDLC ( Adaptive Genomics Data Lossless Compressor) is a experimental open-sourc
 Firstly, clone our tools from GitHub:
 
 ```
-git clone https://github.com/dingyanfeng/Dynamic-skmer.git
+git clone https://github.com/dingyanfeng/AGDLC.git
 ```
 
-Secondly, turn to Dynamic-skmer directory:
+Secondly, turn to AGDLC directory:
 
 ```
-cd Dynamic-skmer
+cd AGDLC
 ```
 
 ### Usage
