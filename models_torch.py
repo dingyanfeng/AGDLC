@@ -32,7 +32,7 @@ class SingleLSTMModel(nn.Module):
                 proj_factor: 1.3
                 act_fn: gelu
             context_length: {seq_length}
-            num_blocks: 9
+            num_blocks: 1
             embedding_dim: {emb_size}
             """
             cfg = OmegaConf.create(xlstm_cfg)
