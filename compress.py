@@ -143,6 +143,8 @@ def get_argument_parser():
                         help='Number of timesteps')
     parser.add_argument('--bs', type=int, default='320',
                         help='Batch Size')
+    parser.add_argument('--emb_size', type=int, default='16',
+                        help='Embedding Size')
     return parser
 
 
@@ -181,7 +183,7 @@ def main():
 
     # 准备参数
     vocab_dict = {}
-    emb_size = 16
+    emb_size = FLAGS.emb_size
     hidden_size = 128
     # ————————
     for number in skmer_list:
@@ -262,7 +264,7 @@ def main():
     shutil.rmtree('temp')
     print("Done")
 
-    print('Peak GPU memory usage: {} KBs'.format(torch.cuda.max_memory_allocated() // 1024))
+    print('Peak GPU memory usage: {} KBs'.format(torch.cuda.max_memory_allocated(device=device) // 1024))
 
 
 if __name__ == "__main__":

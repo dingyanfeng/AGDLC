@@ -22,11 +22,6 @@ class SingleLSTMModel(nn.Module):
         elif module_type == "xLSTM":
             xlstm_cfg = f""" 
             vocab_size: {vocab_size}
-            mlstm_block:
-              mlstm:
-                conv1d_kernel_size: 4
-                qkv_proj_blocksize: 4
-                num_heads: 4
             slstm_block:
               slstm:
                 backend: 'vanilla'
@@ -37,9 +32,8 @@ class SingleLSTMModel(nn.Module):
                 proj_factor: 1.3
                 act_fn: gelu
             context_length: {seq_length}
-            num_blocks: 5
+            num_blocks: 9
             embedding_dim: {emb_size}
-            slstm_at: [] #[1]
             """
             cfg = OmegaConf.create(xlstm_cfg)
             cfg = from_dict(data_class=xLSTMLMModelConfig, data=OmegaConf.to_container(cfg), config=DaciteConfig(strict=True))

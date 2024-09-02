@@ -148,6 +148,8 @@ def get_argument_parser():
                         help='Name of the output file')
     parser.add_argument('--module_type', type=str, default='LSTM',
                         help='Module Type')
+    parser.add_argument('--emb_size', type=int, default='16',
+                        help='Embedding Size')
     return parser
 
 
@@ -205,7 +207,7 @@ def main():
     series = np.zeros(len_series,dtype=np.uint8)
 
     vocab_dict = {}
-    emb_size = 16
+    emb_size = FLAGS.emb_size
     hidden_size = 128
     skmer_list= [float(num) for num in FLAGS.skmer_list.split('+')]
     for number in skmer_list:

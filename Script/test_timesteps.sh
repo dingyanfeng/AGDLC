@@ -1,12 +1,11 @@
 #!/bin/bash
 data=$1
 GPU=$2
-M_TIMESTEPS=$3
 echo ${data}
 base_name=$(basename ${data})
 base_name_without_extension=$(echo "$base_name" | cut -d. -f1)
 # 创建保存结果的目录
-data_path=/home/dyf/Dynamic-skmer/Result-om/sklist/${base_name_without_extension}
+data_path=/home/dyf/Dynamic-skmer/Result-om/timesteps/${base_name_without_extension}
 if [ ! -d "${data_path}" ]; then
   mkdir -p "${data_path}"
   echo "Created directory: ${data_path}"
@@ -43,16 +42,17 @@ function LogFile() {
 function DSKmer() {
   T_SKLIST=$1
   T_MODULE=$2
+  T_TIMESTEPS=$3
   echo "Running DSKmer algorithm"
   echo "1 Create log file..."
   LogFile ${T_MODULE}
   echo "2 Execute compression task..."
   log=${data_path}/$2/comp-$1.log
-  (/bin/time -v -p sh /home/dyf/Dynamic-skmer/compress.sh ${data} ${T_SKLIST} ${T_MODULE} ${GPU} ${M_TIMESTEPS}) >${log} 2>&1
+  (/bin/time -v -p sh /home/dyf/Dynamic-skmer/compress-bs.sh ${data} ${T_SKLIST} ${T_MODULE} ${GPU} ${T_TIMESTEPS} 320) >${log} 2>&1
 
   if [ $? -ne 0 ]; then
     echo "compression task ERROR!"
-    echo "/bin/time -v -p sh /home/dyf/Dynamic-skmer/compress.sh ${data} ${T_SKLIST} ${T_MODULE} ${GPU} ${M_TIMESTEPS}"
+    echo "/bin/time -v -p sh /home/dyf/Dynamic-skmer/compress-bs.sh ${data} ${T_SKLIST} ${T_MODULE} ${GPU} ${T_TIMESTEPS} 320"
     exit 1
   fi
   echo "3 Statistical compression information..."
@@ -93,7 +93,7 @@ function DSKmer() {
   # echo "Throughtput : ${TRP} KB/S"
   echo "6 Output file into ${sum_result}..."
   # "ALG, DS(B), CS(B), CR(bits/base), CT(S), DT(S), CPM(KB), DPM(KB)"
-  echo "${T_SKLIST}_${T_MODULE}, ${SourceFileSize}, ${CompressedFileSize}, ${CompressionRatio}, $(timer_reans $CompressionTime), ${CompressionMemory}" >>${sum_result}
+  echo "${T_SKLIST}_${T_MODULE}_${T_TIMESTEPS}, ${SourceFileSize}, ${CompressedFileSize}, ${CompressionRatio}, $(timer_reans $CompressionTime), ${CompressionMemory}" >>${sum_result}
   # echo "7 Check the integrity of the decompressed file..."
   # python /home/dyf/Dynamic-skmer/Script/tool.py cmp /home/dyf/Dynamic-skmer/DecompRes/${base_name_without_extension} ${data}
   # if [ $? -ne 0 ]; then
@@ -108,125 +108,8 @@ function DSKmer() {
   # rm -rf Params-Seq/params_${base_name_without_extension}*
 #   cd ${pwd_path}
 }
-
-# echo "************************************************"
-# DSKmer ${data} ${SKLIST} ${MODULE_TYPE}
-# echo "************************************************"
-# for (( i = 1; i <= 4; i++ )); do
-#   for (( j = i; j <= 4; j++ )); do
-#     echo "DSKmer ${i}.${j} LSTM"
-#     DSKmer ${i}.${j} LSTM
-#   done
-# done
-# for (( i = 1; i <= 4; i++ )); do
-#   for (( j = i; j <= 4; j++ )); do
-#     echo "DSKmer ${i}.${j} biLSTM"
-#     DSKmer ${i}.${j} biLSTM
-#   done
-# done
-# for (( i = 1; i <= 4; i++ )); do
-#   for (( j = i; j <= 4; j++ )); do
-#     echo "DSKmer ${i}.${j} xLSTM"
-#     DSKmer ${i}.${j} xLSTM
-#   done
-# done
-# echo "DSKmer 1.1+1.2 LSTM"
-# DSKmer 1.1+1.2 LSTM
-
-# echo "DSKmer 1.2+2.2 LSTM"
-# DSKmer 1.2+2.2 LSTM
-
-# echo "DSKmer 2.2+2.3 LSTM"
-# DSKmer 2.2+2.3 LSTM
-
-# echo "DSKmer 1.3+2.3 LSTM"
-# DSKmer 1.3+2.3 LSTM
-
-# echo "DSKmer 2.3+3.3 LSTM"
-# DSKmer 2.3+3.3 LSTM
-
-# echo "DSKmer 3.3+3.4 LSTM"
-# DSKmer 3.3+3.4 LSTM
-
-# echo "DSKmer 1.4+2.4 LSTM"
-# DSKmer 1.4+2.4 LSTM
-
-# echo "DSKmer 2.4+3.4 LSTM"
-# DSKmer 2.4+3.4 LSTM
-
-# echo "DSKmer 3.4+4.4 LSTM"
-# DSKmer 3.4+4.4 LSTM
-
-# echo "DSKmer 1.1+1.2 biLSTM"
-# DSKmer 1.1+1.2 biLSTM
-
-# echo "DSKmer 1.2+2.2 biLSTM"
-# DSKmer 1.2+2.2 biLSTM
-
-# echo "DSKmer 2.2+2.3 biLSTM"
-# DSKmer 2.2+2.3 biLSTM
-
-# echo "DSKmer 1.3+2.3 biLSTM"
-# DSKmer 1.3+2.3 biLSTM
-
-# echo "DSKmer 2.3+3.3 biLSTM"
-# DSKmer 2.3+3.3 biLSTM
-
-# echo "DSKmer 3.3+3.4 biLSTM"
-# DSKmer 3.3+3.4 biLSTM
-
-# echo "DSKmer 1.4+2.4 biLSTM"
-# DSKmer 1.4+2.4 biLSTM
-
-# echo "DSKmer 2.4+3.4 biLSTM"
-# DSKmer 2.4+3.4 biLSTM
-
-# echo "DSKmer 3.4+4.4 biLSTM"
-# DSKmer 3.4+4.4 biLSTM
-
-# echo "DSKmer 1.1+1.2 xLSTM"
-# DSKmer 1.1+1.2 xLSTM
-
-# echo "DSKmer 1.2+2.2 xLSTM"
-# DSKmer 1.2+2.2 xLSTM
-
-# echo "DSKmer 2.2+2.3 xLSTM"
-# DSKmer 2.2+2.3 xLSTM
-
-# echo "DSKmer 1.3+2.3 xLSTM"
-# DSKmer 1.3+2.3 xLSTM
-
-# echo "DSKmer 2.3+3.3 xLSTM"
-# DSKmer 2.3+3.3 xLSTM
-
-# echo "DSKmer 3.3+3.4 xLSTM"
-# DSKmer 3.3+3.4 xLSTM
-
-# echo "DSKmer 1.4+2.4 xLSTM"
-# DSKmer 1.4+2.4 xLSTM
-
-# echo "DSKmer 2.4+3.4 xLSTM"
-# DSKmer 2.4+3.4 xLSTM
-
-# echo "DSKmer 3.4+4.4 xLSTM"
-# DSKmer 3.4+4.4 xLSTM
-# echo "DSKmer 1.1 xLSTM"
-# DSKmer 1.1 xLSTM
-
-# echo "DSKmer 1.2 xLSTM"
-# DSKmer 1.2 xLSTM
-
-# echo "DSKmer 2.2 xLSTM"
-# DSKmer 2.2 xLSTM
-
-# echo "DSKmer 2.3 xLSTM"
-# DSKmer 2.3 xLSTM
-
-# echo "DSKmer 1.1+1.2 xLSTM"
-# DSKmer 1.1+1.2 xLSTM
-
-echo "DSKmer 2.2+2.3 xLSTM"
-DSKmer 2.2+2.3 xLSTM
-
-cat ${sum_result}
-exit 0
+for (( i = 6; i >= 1; i-- )); do
+    TS_I=$((i * 8))
+    echo "DSKmer 2.2+2.3 xLSTM $TS_I"
+    DSKmer 2.2+2.3 xLSTM $TS_I
+done
