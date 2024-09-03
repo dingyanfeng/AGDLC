@@ -6,11 +6,11 @@
 
 ### Requirements
 
-0.GPU
+0. GPU
 
-1.Python 3.11.9
+1. Python 3.11.9
 
-2.xlstm(See [NX-AI/xlstm](https://github.com/NX-AI/xlstm))
+2. xlstm module ( See [NX-AI/xlstm](https://github.com/NX-AI/xlstm))
 
 ### Copy Our Project
 
