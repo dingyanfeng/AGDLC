@@ -2,7 +2,7 @@
 
 ### About The AGDLC
 
-AGDLC ( Adaptive Genomics Data Lossless Compressor) is a experimental open-source lossless compressor. The compressor is learning-based and utilizing xLSTM as the backbone of the prediction network. To further enhance the compression ration, we design a multiple (*s*,*k*)-mer encoding module. The code can run on GPU platform.
+**AGDLC** is an experimental learning-based genomics data lossless compressor, which utilize xLSTM-based context modeling and multiple (*s*,*k*)-mer encoding. The code can run on GPU platform.
 
 ### Requirements
 
